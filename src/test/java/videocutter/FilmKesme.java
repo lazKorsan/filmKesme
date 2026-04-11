@@ -7,22 +7,24 @@ import net.bramp.ffmpeg.builder.FFmpegBuilder;
 import java.util.concurrent.TimeUnit; // Bu import'u ekleyin
 
 public class FilmKesme {
+    // 14:50
     public static void main(String[] args) {
         try {
             // Kendi video dosyanızın yolunu buraya yazın
-            String girisDosyasi = "C:\\Users\\Hp\\OneDrive\\Desktop\\video_kesmekliklik\\kesilecek.mp4";
+            String girisDosyasi = "C:\\Users\\user\\Desktop\\video_kesmekliklik\\kesilecek.mp4";
+
 
             // Kesilmiş videonun nereye kaydedileceğini buraya yazın
-            String cikisDosyasi = "C:\\Users\\Hp\\OneDrive\\Desktop\\video_kesmekliklik\\kesilen.mp4";
+            String cikisDosyasi = "C:\\Users\\user\\Desktop\\video_kesmekliklik\\kesilen.mp4";
 
-            FFmpeg ffmpeg = new FFmpeg("C:\\ffmpeg\\bin\\ffmpeg.exe");
+            FFmpeg ffmpeg = new FFmpeg("C:\\ffmpeg-master-latest-win64-gpl\\bin\\ffmpeg.exe");
 
             FFmpegBuilder builder = new FFmpegBuilder()
                     .setInput(girisDosyasi)
                     .overrideOutputFiles(true)
                     .addOutput(cikisDosyasi)
-                    .setStartOffset(120, TimeUnit.SECONDS)    // 2. dakikadan başla (5dk - 3dk = 2dk)
-                    .setDuration(180, TimeUnit.SECONDS)       // 3 dakika al
+                    .setStartOffset(001, TimeUnit.SECONDS)
+                    .setDuration(1142, TimeUnit.SECONDS)
                     .done();
 
             FFmpegExecutor executor = new FFmpegExecutor(ffmpeg);
