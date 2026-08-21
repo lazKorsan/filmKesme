@@ -9,7 +9,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
-public class videoMix2 {
+public class videoMix5 {
 
     public static void main(String[] args) {
         try {
@@ -17,45 +17,37 @@ public class videoMix2 {
             String video1 = "C:\\Users\\user\\Desktop\\video_kesmekliklik\\video1.mp4";
             String video2 = "C:\\Users\\user\\Desktop\\video_kesmekliklik\\video2.mp4";
             String video3 = "C:\\Users\\user\\Desktop\\video_kesmekliklik\\video3.mp4";
-            String video4 = "C:\\Users\\user\\Desktop\\video_kesmekliklik\\video4.mp4";
             String cikisDosyasi = "C:\\Users\\user\\Desktop\\video_kesmekliklik\\birlesmis_video.mp4";
 
-            // 2. FFmpeg yolu
+            // 2. FFmpeg yolu (FilmKesme dosyanızdaki ile aynı olmalı)
             FFmpeg ffmpeg = new FFmpeg("C:\\ffmpeg-master-latest-win64-gpl\\bin\\ffmpeg.exe");
 
-            // 3. Geçici liste dosyası oluştur
+            // 3. FFmpeg'in okuyabilmesi için geçici bir liste dosyası (.txt) oluşturuyoruz
+            // Bu dosya içeriği şu şekilde olmalı: file 'yol/video1.mp4'
             File listFile = new File("C:\\Users\\user\\Desktop\\video_kesmekliklik\\liste.txt");
             try (BufferedWriter writer = new BufferedWriter(new FileWriter(listFile))) {
-                writer.write("file '" + video1.replace("\\", "/") + "'");
+                writer.write("file '" + video1 + "'");
                 writer.newLine();
-                writer.write("file '" + video2.replace("\\", "/") + "'");
+                writer.write("file '" + video2 + "'");
             }
 
-            System.out.println("🎬 Videolar birleştiriliyor (yeniden kodlanıyor)...");
-            System.out.println("Bu işlem birkaç dakika sürebilir...");
-
-            // 4. BİRLEŞTİRME - YENİDEN KODLAMA İLE (copy yerine)
-            // Bu yöntem videolar farklı özelliklerde olsa bile düzgün çalışır
+            // 4. Birleştirme (Concat) İşlemi
+            // NOT: Videoların çözünürlükleri ve fps değerleri aynıysa 'copy' modu en hızlısıdır.
             FFmpegBuilder builder = new FFmpegBuilder()
                     .setInput(listFile.getAbsolutePath())
-                    .setFormat("concat")
-                    .addExtraArgs("-safe", "0")
+                    .setFormat("concat") // Birleştirme formatı
+                    .addExtraArgs("-safe", "0") // Dosya yollarındaki özel karakterler için
                     .overrideOutputFiles(true)
                     .addOutput(cikisDosyasi)
-                    .setVideoCodec("libx264")     // H.264 video codec
-                    .setAudioCodec("aac")         // AAC audio codec
-                    .setVideoFrameRate(30)         // Sabit FPS (videolarından birinin FPS'ine göre ayarla)
-                    .setVideoResolution(1920, 1080) // Sabit çözünürlük
-                    .setAudioBitRate(128000)       // 128k bitrate
-                    .setVideoBitRate(2500000)      // 2.5M bitrate
-                    .addExtraArgs("-preset", "medium") // Hız/kalite dengesi (fast, medium, slow)
-                    .addExtraArgs("-crf", "23")    // Kalite (18-28 arası, düşük sayı daha iyi kalite)
+                    .addExtraArgs("-c", "copy") // Yeniden kodlamadan (render almadan) hızlıca birleştirir
                     .done();
+
+            System.out.println("🎬 Videolar birleştiriliyor, lütfen bekleyin...");
 
             FFmpegExecutor executor = new FFmpegExecutor(ffmpeg);
             executor.createJob(builder).run();
 
-            // 5. Geçici dosyayı sil
+            // 5. İşlem bitince geçici txt dosyasını silelim
             if (listFile.exists()) {
                 listFile.delete();
             }
