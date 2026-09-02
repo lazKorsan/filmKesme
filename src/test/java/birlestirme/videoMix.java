@@ -4,57 +4,48 @@ import net.bramp.ffmpeg.FFmpeg;
 import net.bramp.ffmpeg.FFmpegExecutor;
 import net.bramp.ffmpeg.builder.FFmpegBuilder;
 
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 
 public class videoMix {
 
     public static void main(String[] args) {
         try {
-            // 1. Birleştirilecek videoların yolları
             String video1 = "C:\\Users\\user\\Desktop\\video_kesmekliklik\\video1.mp4";
             String video2 = "C:\\Users\\user\\Desktop\\video_kesmekliklik\\video2.mp4";
-            String cikisDosyasi = "C:\\Users\\user\\Desktop\\video_kesmekliklik\\birlesmis_video.mp4";
+            String output = "C:\\Users\\user\\Desktop\\video_kesmekliklik\\birlesmis_video.mp4";
 
-            // 2. FFmpeg yolu (FilmKesme dosyanızdaki ile aynı olmalı)
             FFmpeg ffmpeg = new FFmpeg("C:\\ffmpeg-master-latest-win64-gpl\\bin\\ffmpeg.exe");
 
-            // 3. FFmpeg'in okuyabilmesi için geçici bir liste dosyası (.txt) oluşturuyoruz
-            // Bu dosya içeriği şu şekilde olmalı: file 'yol/video1.mp4'
-            File listFile = new File("C:\\Users\\user\\Desktop\\video_kesmekliklik\\liste.txt");
-            try (BufferedWriter writer = new BufferedWriter(new FileWriter(listFile))) {
-                writer.write("file '" + video1 + "'");
-                writer.newLine();
-                writer.write("file '" + video2 + "'");
-            }
+            // İleri seviye birleştirme - Her zaman çalışır
+            System.out.println("🎬 Videolar birleştiriliyor...");
 
-            // 4. Birleştirme (Concat) İşlemi
-            // NOT: Videoların çözünürlükleri ve fps değerleri aynıysa 'copy' modu en hızlısıdır.
             FFmpegBuilder builder = new FFmpegBuilder()
-                    .setInput(listFile.getAbsolutePath())
-                    .setFormat("concat") // Birleştirme formatı
-                    .addExtraArgs("-safe", "0") // Dosya yollarındaki özel karakterler için
+                    .addInput(video1)
+                    .addInput(video2)
                     .overrideOutputFiles(true)
-                    .addOutput(cikisDosyasi)
-                    .addExtraArgs("-c", "copy") // Yeniden kodlamadan (render almadan) hızlıca birleştirir
+                    .addOutput(output)
+                    // Her iki videoyu da aynı formata getir
+                    .addExtraArgs("-filter_complex",
+                            "[0:v]scale=1920:1080:force_original_aspect_ratio=decrease,pad=1920:1080:(ow-iw)/2:(oh-ih)/2,fps=30,setpts=PTS-STARTPTS[v0];" +
+                                    "[0:a]aresample=44100,asetpts=PTS-STARTPTS[a0];" +
+                                    "[1:v]scale=1920:1080:force_original_aspect_ratio=decrease,pad=1920:1080:(ow-iw)/2:(oh-ih)/2,fps=30,setpts=PTS-STARTPTS[v1];" +
+                                    "[1:a]aresample=44100,asetpts=PTS-STARTPTS[a1];" +
+                                    "[v0][a0][v1][a1]concat=n=2:v=1:a=1[outv][outa]")
+                    .addExtraArgs("-map", "[outv]")
+                    .addExtraArgs("-map", "[outa]")
+                    .addExtraArgs("-c:v", "libx264")
+                    .addExtraArgs("-c:a", "aac")
+                    .addExtraArgs("-preset", "medium")
+                    .addExtraArgs("-crf", "23")
                     .done();
-
-            System.out.println("🎬 Videolar birleştiriliyor, lütfen bekleyin...");
 
             FFmpegExecutor executor = new FFmpegExecutor(ffmpeg);
             executor.createJob(builder).run();
 
-            // 5. İşlem bitince geçici txt dosyasını silelim
-            if (listFile.exists()) {
-                listFile.delete();
-            }
+            System.out.println("✅ Başarılı! Yeni video: " + output);
 
-            System.out.println("✅ Başarılı! Yeni video burada: " + cikisDosyasi);
-
-        } catch (IOException e) {
-            System.err.println("❌ Bir hata oluştu: " + e.getMessage());
+        } catch (Exception e) {
+            System.err.println("❌ Hata: " + e.getMessage());
             e.printStackTrace();
         }
     }

@@ -11,8 +11,8 @@ public class SesYukseltme2 {
 
     public static void main(String[] args) {
         // Giriş ve çıkış dosya yolları
-        String girisDosyasi = "C:\\Users\\user\\Desktop\\film\\bozuk_ses.mp4";
-        String cikisDosyasi = "C:\\Users\\user\\Desktop\\film\\iyilestirilmis_ses.mp4";
+        String girisDosyasi = "C:\\Users\\user\\Desktop\\film\\cucumberframeworkAppiumTestleri.mp4";
+        String cikisDosyasi = "C:\\Users\\user\\Desktop\\film\\cucumberframeworkAppiumTestleri26.mp4";
 
         // Başlangıç zamanını kaydet
         long baslangicZamani = System.currentTimeMillis();
