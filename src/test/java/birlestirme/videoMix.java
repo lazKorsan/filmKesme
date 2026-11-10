@@ -10,9 +10,9 @@ public class videoMix {
 
     public static void main(String[] args) {
         try {
-            String video1 = "C:\\Users\\user\\Desktop\\video_kesmekliklik\\video1.mp4";
-            String video2 = "C:\\Users\\user\\Desktop\\video_kesmekliklik\\video2.mp4";
-            String output = "C:\\Users\\user\\Desktop\\video_kesmekliklik\\birlesmis_video.mp4";
+            String video1 = "C:\\Users\\user\\Desktop\\ply\\v1.mp4";
+            String video2 = "C:\\Users\\user\\Desktop\\ply\\v2.mp4";
+            String output = "C:\\Users\\user\\Desktop\\ply\\b1.mp4";
 
             FFmpeg ffmpeg = new FFmpeg("C:\\ffmpeg-master-latest-win64-gpl\\bin\\ffmpeg.exe");
 
