@@ -24,7 +24,7 @@ public class FilmKesme {
                     .overrideOutputFiles(true)
                     .addOutput(cikisDosyasi)
                     .setStartOffset(001, TimeUnit.SECONDS)
-                    .setDuration(535, TimeUnit.SECONDS)
+                    .setDuration(513, TimeUnit.SECONDS)
                     .done();
 
             FFmpegExecutor executor = new FFmpegExecutor(ffmpeg);
